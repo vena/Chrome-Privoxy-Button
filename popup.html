@@ -1,2 +1,23 @@
-<iframe id="ijbstatus" frameborder="0" scrolling="no" width="250" height="65" src="http://config.privoxy.org/toggle?mini=y"></iframe>
+<!DOCTYPE html>
+<head>
+	<style>
+		html { border: 1px solid #DDD; }
+		body {
+			background: #EEE;
+			padding-top: 3px;
+		}
+		a { outline: 0; }
+		iframe {
+			border: 1px solid #CCC;
+			border-bottom-color: #AAA;
+			border-top: 0;
+		}
+	</style>
+</head>
+<body>
+<!-- Chrome focuses the first link and we can't remove the outline in the iframe -->
+<a href="#"></a>
+
 <script src="popup.js"></script>
+</body>
+</html>

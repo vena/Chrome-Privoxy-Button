@@ -1,0 +1,28 @@
+<style>
+	html,body {
+		background: #600; 
+		font: 13px/1.25 Arial, sans-serif;
+	}
+	.error {
+		background: darkred;
+		border: 1px solid #500;
+		border-bottom-color: #300;
+		border-top: 0;
+		color: white;
+		height: auto;
+		padding: .5em 1em;
+		width: 300px;
+	}
+	.error a { color: pink; outline: 0; }
+	.error ul { padding-left: 2em; }
+	.error li { margin: 0 0 .25em; }
+</style>
+<div class="error">
+	<p><strong>Access denied!</strong></p>
+	<p>Access has been denied due to one of the following conditions:</p>
+	<ul>
+		<li>You have not set <a href="http://config.privoxy.org/user-manual/config.html#ENABLE-REMOTE-TOGGLE" target="_blank">enable-remote-toggle</a> in Privoxy's configuration.</li>
+		<li>You did not come here through one of Privoxy's CGI pages.</li>
+		<li>The "Referer:" header was blocked.</li>
+	</ul>
+</div>

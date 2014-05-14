@@ -5,13 +5,29 @@ var Privoxy = {
 			var XHR = new XMLHttpRequest();
 			XHR.onreadystatechange = function() {
 				if (XHR.readyState == 4) {
+					// Proxy isn't enabled
+					if (XHR.status === 0) {
+						callback(-3);
+						return;
+					}
+					// Proxy failed
+					if (XHR.status != 200) {
+						callback(-2);
+						return;
+					}
 					callback(Privoxy.status.parse(XHR.responseText));
 				}
 			};
-			XHR.open("GET", "http://config.privoxy.org/toggle?mini=y", true);
+			XHR.open("GET", "http://config.privoxy.org/toggle?mini=y&t=" + Date.now(), true);
 			XHR.send();
 		},
 		parse: function(page) {
+			if (/is not being used/.test(page)) {
+				return -3;
+			}
+			if (/Privoxy Configuration access denied/.test(page)) {
+				return -1;				
+			}
 			if (/enabled/.test(page)) {
 				return true;
 			}
@@ -20,7 +36,19 @@ var Privoxy = {
 		update: function() {
 			Privoxy.log("Updating Privoxy Status...");
 			Privoxy.status.fetch(function(status) {
-				if (status) {
+				if (status === -3) {
+					chrome.runtime.sendMessage("Privoxy Not Enabled");
+					return false;
+				}
+				if (status === -2) {
+					chrome.runtime.sendMessage("Privoxy Network Error");
+					return false;
+				}
+				if (status === -1) {
+					chrome.runtime.sendMessage("Privoxy Access Error");
+					return false;
+				}
+				if (status === true) {
 					chrome.runtime.sendMessage("Privoxy Enabled");
 					return true;
 				}
@@ -54,13 +82,18 @@ var Privoxy = {
 	icon: {
 		enabled: function() {
 			Privoxy.log("Privoxy Enabled");
-			chrome.browserAction.setIcon({ path: 'icons/privoxy-enabled.png' });
+			chrome.browserAction.setIcon({ path: 'icons/48/privoxy-enabled.png' });
 			chrome.browserAction.setTitle({ title: "Disable Privoxy" });
 		},
 		disabled: function() {
 			Privoxy.log("Privoxy DISABLED");
-			chrome.browserAction.setIcon({ path: 'icons/privoxy-disabled.png' });
+			chrome.browserAction.setIcon({ path: 'icons/48/privoxy-disabled.png' });
 			chrome.browserAction.setTitle({ title: "Enable Privoxy" });
+		},
+		error: function() {
+			Privoxy.log("Privoxy ERROR");
+			chrome.browserAction.setIcon({ path: 'icons/48/privoxy-error.png' });
+			chrome.browserAction.setTitle({ title: "Error!" });
 		}
 	},
 	log: function() {
@@ -74,14 +107,28 @@ var Privoxy = {
  * Handle internal messages
  */
 chrome.runtime.onMessage.addListener(function(message, sender, responseCallback) {
-	if (message == 'Privoxy Enabled') {
-		Privoxy.icon.enabled();
-	}
-	if (message == 'Privoxy Disabled') {
-		Privoxy.icon.disabled();
-	}
-	if (message == "Update Privoxy Status") {
-		Privoxy.status.update();
+	switch(message) {
+		case "Privoxy Not Enabled":
+			Privoxy.icon.error();
+			chrome.browserAction.setPopup({ popup: "error-notfound.html" });
+			break;
+		case "Privoxy Network Error":
+			Privoxy.icon.error();
+			chrome.browserAction.setPopup({ popup: "error-network.html" });
+			break;
+		case "Privoxy Access Error":
+			Privoxy.icon.error();
+			chrome.browserAction.setPopup({ popup: "error-access.html" });
+			break;
+		case "Privoxy Enabled":
+			Privoxy.icon.enabled();
+			break;
+		case "Privoxy Disabled":
+			Privoxy.icon.disabled();
+			break;
+		case "Update Privoxy Status":
+			Privoxy.status.update();
+			break;
 	}
 });
 
@@ -89,9 +136,10 @@ chrome.runtime.onMessage.addListener(function(message, sender, responseCallback)
 chrome.alarms.create("Update Privoxy Status", { periodInMinutes: 1 });
 chrome.alarms.onAlarm.addListener(Privoxy.status.update);
 
-// Update status at launch
-Privoxy.status.update();
-
 // Handle clicks on browser icon
 //chrome.browserAction.onClicked.addListener(Privoxy.toggle);
 chrome.browserAction.setPopup({popup: "popup.html"});
+
+// Update status at launch
+Privoxy.status.update();
+
