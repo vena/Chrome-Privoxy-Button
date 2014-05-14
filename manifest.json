@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+
+  "name": "Privoxy Button",
+  "description": "Adds an easily-accessible button to your toolbar to enable or disable Privoxy",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "icons/privoxy-disabled.png",
+    "default_title": "Enable Privoxy"
+  },
+
+  "background": {
+    "scripts": ["global.js"],
+    "persistent": false
+  },
+
+  "permissions": ["http://config.privoxy.org/", "alarms"]
+}
