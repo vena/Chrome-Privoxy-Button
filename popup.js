@@ -9,3 +9,14 @@ iframe.addEventListener('load', function() {
 });
 
 document.body.appendChild(iframe);
+
+chrome.runtime.onMessage.addListener(function(message) {
+	switch(message) {
+		case "Privoxy Enabled":
+			document.body.className = "enabled";
+			break;
+		case "Privoxy Disabled":
+			document.body.className = "disabled";
+			break;
+	}
+});

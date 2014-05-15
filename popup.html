@@ -2,14 +2,17 @@
 <head>
 	<style>
 		html { border: 1px solid #DDD; }
-		body {
+		body,body.disabled {
 			background: #EEE;
-			padding-top: 3px;
+			padding-top: 4px;
+		}
+		body.enabled {
+			background: #68C;
 		}
 		a { outline: 0; }
 		iframe {
-			border: 1px solid #CCC;
-			border-bottom-color: #AAA;
+			border: 1px solid rgba(0,0,0,0.15);
+			border-bottom-color: rgba(0,0,0,0.25);
 			border-top: 0;
 		}
 	</style>
